@@ -1,0 +1,252 @@
+<!doctype html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="target-densitydpi=medium-dpi,width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta names="apple-mobile-web-app-status-bar-style" content="black" />
+	<meta name="format-detection" content="telephone=no" />
+    <link rel="apple-touch-icon" href="$CDN$/icon.png"/>
+</head>
+<style>
+	.autosuggest {font-size:12px;}
+	.autosuggest input[type="text"] {font-size:12px; font-style:italic; color:#aaaaaa;}
+	.autosuggest .suggestions {cursor:pointer; border:1px solid #888888; background:#FFFFFF; margin:5px 0; text-align:left; color:black;}
+	.autosuggest table.suggestions {border-spacing:0; border-collapse:collapse;}
+	.autosuggest table.suggestions td {padding:2px;}
+	.autosuggest .suggestions .suggestion .exchange {font-size:10px; color:#555555;}
+	.autosuggest .suggestions .suggestion .more {font-style:italic; color:#555555;}
+	.autosuggest .suggestions .suggestion.even {background:#EEEEEE;}
+	.autosuggest .suggestions .suggestion.odd {background:#F9F9F9;}
+	.autosuggest .suggestions .suggestion.hovered {background:#CEE2E5;}
+	.autosuggest .suggestions .suggestion.selected {background: #C4E5C8;}	
+	#content {
+		margin-left:20px;
+	}
+	#evaluationTable {
+		top: 155px;
+	}
+	#price {
+		position: relative;		
+		top: 150px;
+	}
+	.up {background-color:lightgreen}
+	.down {background-color:pink}
+	.hide {display:none}
+	.show {display:block}
+	.yfi_quote_headline ul li {
+		margin: 7px 0;
+		zoom: 1;
+		list-style-type: none;
+		background-image: url(http://l.yimg.com/bm/lib/fi/common/p/d/static/images/0.1.13/2.0.0/news-left-aligned-sprite.png);
+		background-position: -1000px .1em;
+		background-repeat: no-repeat;
+		padding-left: 12px;
+		list-style-position: outside;
+	}
+	.news {
+		position: absolute;
+		top: 0;
+		left: 550px;
+	}
+</style>
+
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+
+
+<script>
+Y = {};
+
+//Lightweight JSONP fetcher - www.nonobtrusive.com
+var JSONP = (function(){
+	var counter = 0, head, query, key, window = this;
+	function load(url) {
+		var script = document.createElement('script'),
+			done = false;
+		script.src = url;
+		script.async = true;
+ 
+		script.onload = script.onreadystatechange = function() {
+			if ( !done && (!this.readyState || this.readyState === "loaded" || this.readyState === "complete") ) {
+				done = true;
+				script.onload = script.onreadystatechange = null;
+				if ( script && script.parentNode ) {
+					script.parentNode.removeChild( script );
+				}
+			}
+		};
+		if ( !head ) {
+			head = document.getElementsByTagName('head')[0];
+		}
+		head.appendChild( script );
+	}
+	function jsonp(url, params, callback) {
+		query = "?";
+		params = params || {};
+		for ( key in params ) {
+			if ( params.hasOwnProperty(key) ) {
+				query += encodeURIComponent(key) + "=" + encodeURIComponent(params[key]) + "&";
+			}
+		}
+		var jsonp = "json" + (++counter);
+		window[ jsonp ] = function(data){
+			callback(data);
+			try {
+				delete window[ jsonp ];
+			} catch (e) {}
+			window[ jsonp ] = null;
+		};
+ 
+		load(url + query + "callback=" + jsonp);
+		return jsonp;
+	}
+	return {
+		get:jsonp
+	};
+}());
+
+	function open_in_new_tab(url )
+	{
+	  window.open(url, '_blank');
+	  window.focus();
+	}
+
+	function ychart() {
+		var defaultYchart = "http://ycharts.com/companies/BCS/chart#series=type%3Acompany%2Cid%3ABCS%2Ccalc%3Aprice%2C%2Cid%3ABCS%2Ctype%3Acompany%2Ccalc%3Aeps%2C%2Cid%3ABCS%2Ctype%3Acompany%2Ccalc%3Arevenues%2C%2Cid%3ABCS%2Ctype%3Acompany%2Ccalc%3Adebt_equity_ratio%2C%2Cid%3ABCS%2Ctype%3Acompany%2Ccalc%3Ainventories_net%2C%2Cid%3ABCS%2Ctype%3Acompany%2Ccalc%3Ar_and_d_expense&format=real&recessions=false&zoom=1&startDate=&endDate=";
+		//Y.$searchbox = Y.$searchbox = $('#ticker input') ;
+		var ticker = document.getElementById('ticker').querySelector('input').value ,
+			myTickerUrl;
+		if (ticker && ticker != Y.autoSuggest.opts.inputText) {			
+			myTickerUrl = defaultYchart.replace(/BCS/g,ticker.toUpperCase()); 	
+			open_in_new_tab(myTickerUrl);
+		}		 		
+	}
+
+	function goStockChart() {
+		var ticker = document.getElementById('ticker').querySelector('input').value ,
+				baseUrl = 'http://stockcharts.com/h-sc/ui?s=WU&p=D&b=5&g=0&id=p98739089537' ,
+				myTickerUrl;
+			if (ticker && ticker != Y.autoSuggest.opts.inputText) {			
+				myTickerUrl = baseUrl.replace(/WU/g,ticker.toUpperCase()); 	
+				open_in_new_tab(myTickerUrl);
+			}	
+	}
+
+	function goValuation() {
+		var ticker = document.getElementById('ticker').querySelector('input').value ,
+				baseUrl = 'http://financials.morningstar.com/valuation/price-ratio.html?t=TSN&region=USA&culture=en-us' ,
+				myTickerUrl;
+			if (ticker && ticker != Y.autoSuggest.opts.inputText) {			
+				myTickerUrl = baseUrl.replace(/TSN/g,ticker.toUpperCase()); 	
+				open_in_new_tab(myTickerUrl);
+			}	
+	}
+	
+	function goMorningStar() {
+		var ticker = document.getElementById('ticker').querySelector('input').value ,
+				baseUrl = 'http://quotes.morningstar.com/stock/s?t=INFY&region=USA&culture=en-us' ,
+				myTickerUrl;
+			if (ticker && ticker != Y.autoSuggest.opts.inputText) {			
+				myTickerUrl = baseUrl.replace(/INFY/g,ticker.toUpperCase()); 	
+				open_in_new_tab(myTickerUrl);
+			}	
+	}
+		
+	function goIndustry() {
+		var ticker = document.getElementById('ticker').querySelector('input').value ,
+				baseUrl = 'http://finance.yahoo.com/q/in?s=QCOR+Industry' ,
+				myTickerUrl;
+			if (ticker && ticker != Y.autoSuggest.opts.inputText) {			
+				myTickerUrl = baseUrl.replace(/QCOR/g,ticker.toUpperCase()); 	
+				open_in_new_tab(myTickerUrl);
+			}	
+	}
+	
+	function goPeasley() {
+		var url = "http://finviz.com/screener.ashx?v=211&f=an_recom_buybetter,cap_mid,fa_epsyoy1_pos,fa_pe_low,fa_peg_low,fa_ps_u2,fa_roa_pos,fa_roe_o15&ft=4";
+		open_in_new_tab(url);
+	}
+	
+	function goNews() {
+		var ticker = document.getElementById('ticker').querySelector('input').value ;
+		var url = "https://www.google.com/finance/company_news?q=NYSE%3A"+ticker+"&ei=ds8pUZD0HcqUiAL_wwE";
+		open_in_new_tab(url);
+	}
+
+	function safeLookup (base, path, defaultValue) {
+	
+		if (typeof path === 'string') {
+			path = path.split('.');
+		}
+	
+		for (var i = 0, l = path.length; i < l; i++) {
+			if (typeof base !== 'undefined' && base !== null && (base = base[path[i]])) {
+			} else {
+				return defaultValue;
+			}
+		}
+		return base;
+	}
+	
+	function isArray (obj) {
+	   if ( obj && obj.constructor.toString().indexOf("Array") != -1)
+	      return true;
+	   else {
+	      return false;
+	   }
+	}
+	
+
+			
+</script>
+
+<script src="common.js"></script>
+<script src="autosuggest.js"></script>
+<script src="lib/jquery.min.js"></script>
+<script src="lib/jquery.handsontable.full.js"></script>
+<link rel="stylesheet" media="screen" href="lib/jquery.handsontable.full.css">
+<script src="mytable.js"></script>
+
+<body>
+	
+	<div id="content">
+		<div id="ticker">
+			<label>Ticker</label>
+			<input id='tickerInput' xonkeyup="autoTicker()" style="width: 220px;margin-left: 40px;"></input>
+		</div>	
+		<div id='buttons' style='margin-top:20px'>
+			<button onclick="ychart()">Ychart</button>
+			<button onclick="goStockChart()">Stockchart</button>
+			<button onclick="goMorningStar()">MorningStar</button>
+			<button onclick="goIndustry()">Industry</button>
+			<button onclick="goPeasley()">Peasley Screener</button>
+			<button onclick="goNews()">News</button>
+		</div>	
+		<div id='price'>
+			<span style='font-weight: bold;margin-right: 50px;'>Quote:</span>
+			<span id='quote' style='margin-right:10px'></span>
+			<span id='change'></span>
+			<br/>
+			<span style='font-weight: bold;margin-right: 5px;'>After Hour's:</span>
+			<span id='quote_aft' style='margin-right:10px'></span>				
+			<span id='change_aft'></span>				
+			<div id='targets'>
+				<span id='dtm' style='font-weight: bold;margin-right: 30px;'>Dirty Target Method:</span>
+				<span id='dirtyTargetMethod'></span>
+				<br/>
+				<span id='dtm2' style='font-weight: bold;margin-right: 30px;'>Dirty Target Method 2:</span>
+				<span id='dirtyTargetMethod2'></span>				
+				<br/>
+				<a id='pf' onclick='goValuation()' style='font-weight: bold;margin-right: 30px;text-decoration: underline;'>Past & Future:</a>				
+				<input id='past_future' onblur='myTable.pastFutureEstimate()'></input>				
+				<span id='past_future_target'></span>
+			</div>			
+		</div>			
+		<div id='evaluationTable'></div>		
+	</div>
+	
+	<iframe id="overlay-iframe" xsrc="upgrade.html" class="hide"></iframe>
+	
+</body>
+
+</html>
