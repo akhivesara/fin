@@ -172,23 +172,7 @@ var myTable = (function() {
 					that.fillSlot(4,1,that._findValue(valuation.tr.td.table.tr,'PEG'));										
 					that.fillSlot(5,1,that._findValue(valuation.tr.td.table.tr,'Price/Sales'));					
 					
-/*					valuation.tr.td.table.tr.forEach(function(entry) {
-						var k = entry.td[0].p.content || entry.td[0].p;
-						var v;
-						if (entry.td[1].span) {
-							v = entry.td[1].span.content ;
-						} else if (entry.td[1].p) {
-							v = entry.td[1].p.content || entry.td[1].p;							
-						}
-						if (k && k.indexOf('Trailing P/E')!=-1) {
-							that.fillSlot(2,1,v);
-						}
-						if (k && k.indexOf('Price/Sales')!=-1) {
-							that.fillSlot(5,1,v);
-						}												
-					});
-*/					
-					var fiscalYear = data[1];	
+					var fiscalYear = data[1];
 					that.current.fiscalYear = fiscalYear;				
 					var profitability = data[2];
 					that.current.profitability = profitability;														
@@ -400,10 +384,10 @@ var myTable = (function() {
 		},
 		
 		scrapeNews : function() {
-			var ticker = ticker || $.trim( Y.autoSuggest.$searchbox.val()) ;
+			var ticker =  $.trim( Y.autoSuggest.$searchbox.val()).toUpperCase() ;
 			var url = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Ffinance.yahoo.com%2Fq%2Fh%3Fs%3D"+ticker+"%2BHeadlines%22%20and%20xpath%3D'%2F%2F*%5B%40class%3D%22mod%20yfi_quote_headline%20withsky%22%5D'&format=json&diagnostics=true";
 			this.yqlScrapperCall(url, function(results) {
-				var olderHeadline = results.div.table[1].tr[0].td.strong.a.href;
+				var olderHeadline = safeLookup(results.div, 'table.tr.0.td.strong.a.href');
 				var _on = document.createElement('a');
 				_on.href = 'http://finance.yahoo.com'+olderHeadline;
 				_on.target = '_blank';

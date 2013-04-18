@@ -458,6 +458,15 @@ SCC.AutoSuggest.prototype = {
 
 document.addEventListener('DOMContentLoaded', function() {
 	Y.autoSuggest  =new SCC.AutoSuggest('#ticker input');
+    var ticker = urlParams.get('s');
+    if (ticker) {
+        Y.autoSuggest.$searchbox.val(ticker);
+        Y.autoSuggest.$searchbox.focus();
+        Y.autoSuggest.$searchbox.keyup({});
+        setTimeout(function() {
+        Y.autoSuggest.$searchbox.blur();
+        },1000)
+    }
 //	myTable.create();
 }, false);
 
