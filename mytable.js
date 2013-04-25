@@ -5,13 +5,17 @@ var myTable = (function() {
 	    ["", "Ticker", "Industry" , "Target"],
 	    ["", "", ""],
 	    ["P/E", "", "" , "low"],
-	    ["E/Y", "" , "" , ">= 3.06% (150% of 10Y T-bond) "],
+	    ["E/Y", "" , "" , ">= 3.06%"], //(150% of 10Y T-bond)
 	    ["PEG", "" , "" , "0.5-1"],
 	    ["P/S", "" , "" , "<=2"],
 	    ["ROE", "" , "" , ">17%"],
 		["Dividend", "" , "" , ""],
-		["Payout Ratio", "" , "" , ""],		
-		["Market Cap", "" , "" , ""]		
+		["Payout Ratio", "" , "" , ""],
+        ["Dividend Date" , "" , "", ""],
+		["Market Cap", "" , "" , ""],
+        ["% Short", "" , "" , ""],
+        ["Change % Short", "" , "" , ""]
+
 	  ];
 	
 	var TEN_YR_BOND = '2.04';
@@ -34,14 +38,18 @@ var myTable = (function() {
 		    ["", "Ticker", "Industry" , "Target"],
 		    ["", "", ""],
 		    ["P/E", "", "" , "low"],
-		    ["E/Y", "" , "" , ">= 3.06% (150% of 10Y T-bond) "],
-		    ["PEG", "" , "" , "0.5-1"],
+		    ["E/Y", "" , "" , ">= 3.06%"], //(150% of 10Y T-bond)
+                ["PEG", "" , "" , "0.5-1"],
 		    ["P/S", "" , "" , "<=2"],
 		    ["ROE", "" , "" , ">17%"],
 			["Dividend", "" , "" , ""],
-			["Payout Ratio", "" , "" , ""],					
-			["Market Cap", "" , "" , ""]
-		  ]);
+			["Payout Ratio", "" , "" , ""],
+            ["Dividend Date" , "" , "", ""],
+			["Market Cap", "" , "" , ""],
+            ["% Short", "" , "" , ""],
+            ["Change % Short", "" , "" , ""]
+
+            ]);
 		},
 		
 		create : function(data) {
@@ -164,7 +172,7 @@ var myTable = (function() {
 					var data = results.table;
 					var valuation = data[0];
 					that.current.valuation = valuation;
-					that.fillSlot(9,1,that._findValue(valuation.tr.td.table.tr,'Market Cap'));
+					that.fillSlot(10,1,that._findValue(valuation.tr.td.table.tr,'Market Cap'));
 					that.fillSlot(2,1,that._findValue(valuation.tr.td.table.tr,'Trailing P/E'));
 					if (that._findValue(valuation.tr.td.table.tr,'Trailing P/E') != 'N/A') {
 						that.fillSlot(3,1,(100*(1/that._findValue(valuation.tr.td.table.tr,'Trailing P/E'))).toFixed(2)+'%');
@@ -189,11 +197,19 @@ var myTable = (function() {
 					var stockPriceHistory = data[7];
 					that.current.stockPriceHistory = stockPriceHistory;																																		
 					var shareStatistics = data[8];
-					that.current.shareStatistics = shareStatistics;																																							
+					that.current.shareStatistics = shareStatistics;
+                    that.fillSlot(11,1,that._findValue(shareStatistics.tr.td.table.tr,'Short % of Float', 'td.0.p.content','td.1.p' ));
+                    var nowShort = that._findValue(shareStatistics.tr.td.table.tr,'Shares Short (prior month)', 'td.0.p.content','td.1.p' );
+                    var lastShort = that._findValue(shareStatistics.tr.td.table.tr,'Shares Short', 'td.0.p.content','td.1.p' );
+                    var changeShort = parseFloat(nowShort) - parseFloat(lastShort);
+                    if (changeShort != undefined) {
+                        that.fillSlot(12,1,changeShort.toFixed(2));
+                    }
 					var dividendsSplits = data[9];
 					that.current.dividendsSplits = dividendsSplits;																																												
 					that.fillSlot(7,1,that._findValue(dividendsSplits.tr.td.table.tr,'Forward Annual Dividend Yield', 'td.0.p.content','td.1.p' ));					
-					that.fillSlot(8,1,that._findValue(dividendsSplits.tr.td.table.tr,'Payout Ratio', 'td.0.p.content','td.1.p' ));										
+					that.fillSlot(8,1,that._findValue(dividendsSplits.tr.td.table.tr,'Payout Ratio', 'td.0.p.content','td.1.p' ));
+                    that.fillSlot(9,1,that._findValue(dividendsSplits.tr.td.table.tr,'Dividend Date', 'td.0.p.content','td.1.p' ));
 	        	}
 			});
 		},
