@@ -31,6 +31,11 @@
 	#evaluationTable {
 		top: 155px;
 	}
+    #fundTable {
+        top:250px;
+        width: 1000px;
+        overflow: auto;
+    }
 	#price {
 		position: relative;		
 		top: 150px;
@@ -53,6 +58,8 @@
 		position: absolute;
 		top: 0;
 		left: 400px;
+        height: 750px;
+        overflow-y: scroll;
 	}
 </style>
 
@@ -112,8 +119,8 @@ var JSONP = (function(){
 
 	function open_in_new_tab(url )
 	{
-	  window.open(url, '_blank');
-	  window.focus();
+	  var win = window.open(url, '_blank');
+	  win.focus();
 	}
 
 	function ychart() {
@@ -206,12 +213,17 @@ var JSONP = (function(){
 </script>
 
 <script src="lib/UrlParams.js"></script>
+<script src="lib/Class.js"></script>
+<script src="lib/yqlscrapper.js"></script>
+<script src="lib/scrapper.js"></script>
 <script src="common.js"></script>
 <script src="autosuggest.js"></script>
 <script src="lib/jquery.min.js"></script>
 <script src="lib/jquery.handsontable.full.js"></script>
 <link rel="stylesheet" media="screen" href="lib/jquery.handsontable.full.css">
+<script src="table.js"></script>
 <script src="mytable.js"></script>
+<script src="fundTable.js"></script>
 
 <body>
 	
@@ -248,7 +260,9 @@ var JSONP = (function(){
 				<span id='past_future_target'></span>
 			</div>			
 		</div>			
-		<div id='evaluationTable'></div>		
+		<div id='evaluationTable'></div>
+        <div id="fundHeader" style="top: 235px;position: relative;text-decoration: underline">Fund Holdings</div>
+        <div id='fundTable'></div>
 	</div>
 	
 	<iframe id="overlay-iframe" xsrc="upgrade.html" class="hide"></iframe>

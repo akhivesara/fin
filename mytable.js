@@ -76,7 +76,8 @@ var myTable = (function() {
 			//$("#evaluationTable").handsontable('setDataAtCell', 2, 2, ticker);
 			this.scrapeYahoo(ticker);
 			this.scrapeIndustryLink();
-			this.scrapeTickerPrice();			
+			this.scrapeTickerPrice();
+            fund.fillTable(ticker);
 			setTimeout(function() {
 				that.applyCellColor();				
 				that.scrapeEstimates();				
@@ -398,8 +399,41 @@ var myTable = (function() {
 			 	$('#past_future_target').text('('+t_min.toFixed(2)+' - '+t_max.toFixed(2) + ')  -> ('+t_min_p.toFixed(2)+' - '+t_max_p.toFixed(2) +')%');						
 			}
 		},
-		
-		scrapeNews : function() {
+
+        getInsiderMonkey : function(ticker,isFund,callback) {
+            scrapper.scrape('http://www.insidermonkey.com/search/all?x=7&y=11&q='+ticker, function(results) {
+                var div = results.div;
+                var url = !isFund ? safeLookup(div, 'a.href') || safeLookup(div , '0.a.href') : div[div.length - 1].a.href;
+                var hedgeUrl = isFund ? url : url+'/hedge-funds/#/';
+                callback = callback || NOOP;
+                scrapper.scrape(hedgeUrl, function(results) {
+                    var table = results.table.tbody.tr;
+                    var primaryKeys = [];
+                    var data = [];
+                    for (var x=0 ; x<results.table.tr.th.length;x++) {
+                        primaryKeys.push(results.table.tr.th[x].p);
+                    }
+                    for (var x=0;x<table.length;x++) {
+                        var item = table[x].td;
+                        data[x] = {};
+                        data[x][primaryKeys[0]] = item[0].p;
+                        data[x][primaryKeys[1]] = {fund:item[1].div.a.content , link : item[1].div.a.href , manager:item[1].div.p};
+                        data[x][primaryKeys[2]] = item[2].p;
+                        data[x][primaryKeys[3]] = item[3].p;
+                        data[x][primaryKeys[4]] = safeLookup(item[4], 'p.content');
+                        data[x][primaryKeys[5]] = item[5].p;
+                    }
+                    console.dir(data);
+                    //window.data = data;
+                    callback(data,hedgeUrl);
+                    /*if (portfolio._myportfolio.data[ticker]) {
+                        portfolio._myportfolio.data[ticker]['hedge'] = data;
+                    }*/
+                }, '//*[@id="stock-holdings-table"]')
+            } , '//*[@class="result"]')
+        },
+
+        scrapeNews : function() {
 			var ticker =  $.trim( Y.autoSuggest.$searchbox.val()).toUpperCase() ;
 			var url = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Ffinance.yahoo.com%2Fq%2Fh%3Fs%3D"+ticker+"%2BHeadlines%22%20and%20xpath%3D'%2F%2F*%5B%40class%3D%22mod%20yfi_quote_headline%20withsky%22%5D'&format=json&diagnostics=true";
 			this.yqlScrapperCall(url, function(results) {
@@ -483,6 +517,7 @@ var myTable = (function() {
 
 document.addEventListener('DOMContentLoaded', function() {
 	myTable.create();
+    scrapper = new Scrapper();
 	var tooltip = $('<div></div>')
 	      .text('Your message here')
 	      .css({
