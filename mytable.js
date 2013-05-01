@@ -72,21 +72,27 @@ var myTable = (function() {
 		fillTickerSlot : function(ticker) {
 			var that = this;
 			this.clear();
+            //fund.clear();
 			this.fillSlot(0,1,ticker.toUpperCase());
 			//$("#evaluationTable").handsontable('setDataAtCell', 2, 2, ticker);
-			this.scrapeYahoo(ticker);
-			this.scrapeIndustryLink();
-			this.scrapeTickerPrice();
-            fund.fillTable(ticker);
+            if (ticker) {
+                this.scrapeYahoo(ticker);
+                this.scrapeIndustryLink();
+                this.scrapeTickerPrice();
+                fund.fillTable(ticker);
+            }
 			setTimeout(function() {
-				that.applyCellColor();				
-				that.scrapeEstimates();				
+				that.applyCellColor();
+                if (ticker) {
+				    that.scrapeEstimates();
+                }
 			},2500);
 			$('#past_future_target').text('');
-			if ($('.news')) {
-				$('.news').text('');
-			}
-			this.scrapeNews();
+            $('.news').remove();
+
+            if (ticker) {
+			    this.scrapeNews();
+            }
 		},
 		
 		applyCellColor : function() {
@@ -443,6 +449,7 @@ var myTable = (function() {
 				_on.target = '_blank';
 				_on.textContent = 'Older News';
 				var headlines = results.div.h3;
+                $(".news").remove();
 				var news = results.div.ul;
 				var _n = document.createElement('div');
 				_n.className = 'news';
