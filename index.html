@@ -124,12 +124,13 @@ var JSONP = (function(){
 	}
 
 	function ychart() {
-		var defaultYchart = "http://ycharts.com/companies/BCS/chart#series=type%3Acompany%2Cid%3ABCS%2Ccalc%3Aprice%2C%2Cid%3ABCS%2Ctype%3Acompany%2Ccalc%3Aeps%2C%2Cid%3ABCS%2Ctype%3Acompany%2Ccalc%3Arevenues%2C%2Cid%3ABCS%2Ctype%3Acompany%2Ccalc%3Adebt_equity_ratio%2C%2Cid%3ABCS%2Ctype%3Acompany%2Ccalc%3Ainventories_net%2C%2Cid%3ABCS%2Ctype%3Acompany%2Ccalc%3Ar_and_d_expense&format=real&recessions=false&zoom=1&startDate=&endDate=";
+        var defaultYchart = "http://ycharts.com/companies/WGL/chart#series=type%3Acompany%2Cid%3AWGL%2Ccalc%3Aprice%2C%2Cid%3AWGL%2Ctype%3Acompany%2Ccalc%3Aeps%2C%2Cid%3AWGL%2Ctype%3Acompany%2Ccalc%3Arevenues%2C%2Cid%3AWGL%2Ctype%3Acompany%2Ccalc%3Adebt_equity_ratio%2C%2Cid%3AWGL%2Ctype%3Acompany%2Ccalc%3Ainventories_net%2C%2Cid%3AWGL%2Ctype%3Acompany%2Ccalc%3Ar_and_d_expense%2C%2Cid%3AWGL%2Ctype%3Acompany%2Ccalc%3Ashares_outstanding&format=real&recessions=false&zoom=1&startDate=&endDate="
+		//var defaultYchart = "http://ycharts.com/companies/BCS/chart#series=type%3Acompany%2Cid%3ABCS%2Ccalc%3Aprice%2C%2Cid%3ABCS%2Ctype%3Acompany%2Ccalc%3Aeps%2C%2Cid%3ABCS%2Ctype%3Acompany%2Ccalc%3Arevenues%2C%2Cid%3ABCS%2Ctype%3Acompany%2Ccalc%3Adebt_equity_ratio%2C%2Cid%3ABCS%2Ctype%3Acompany%2Ccalc%3Ainventories_net%2C%2Cid%3ABCS%2Ctype%3Acompany%2Ccalc%3Ar_and_d_expense&format=real&recessions=false&zoom=1&startDate=&endDate=";
 		//Y.$searchbox = Y.$searchbox = $('#ticker input') ;
 		var ticker = document.getElementById('ticker').querySelector('input').value ,
 			myTickerUrl;
 		if (ticker && ticker != Y.autoSuggest.opts.inputText) {			
-			myTickerUrl = defaultYchart.replace(/BCS/g,ticker.toUpperCase()); 	
+			myTickerUrl = defaultYchart.replace(/WGL/g,ticker.toUpperCase());
 			open_in_new_tab(myTickerUrl);
 		}		 		
 	}
