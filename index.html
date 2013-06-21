@@ -135,11 +135,12 @@ var JSONP = (function(){
 	}
 
 	function goStockChart() {
+
 		var ticker = document.getElementById('ticker').querySelector('input').value ,
-				baseUrl = 'http://stockcharts.com/h-sc/ui?s=WU&p=D&b=5&g=0&id=p98739089537' ,
+				baseUrl = 'http://stockcharts.com/h-sc/ui?s=WGL&p=D&b=5&g=0&id=p74091099095' ,
 				myTickerUrl;
 			if (ticker && ticker != Y.autoSuggest.opts.inputText) {			
-				myTickerUrl = baseUrl.replace(/WU/g,ticker.toUpperCase()); 	
+				myTickerUrl = baseUrl.replace(/WGL/g,ticker.toUpperCase());
 				open_in_new_tab(myTickerUrl);
 			}	
 	}
