@@ -347,7 +347,7 @@ var myTable = (function() {
 			$('#change_aft').removeClass('up');							
 							
 			//var url = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Ffinance.yahoo.com%2Fq%2Fks%3Fs%3D"+ticker+"%2BKey%2BStatistics%22%20and%20xpath%3D'%2F%2F*%5B%40class%3D%22yfi_rt_quote_summary_rt_top%22%5D%2Fp'&format=json&diagnostics=true";
-		      var url = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Ffinance.yahoo.com%2Fq%2Fks%3Fs%3DAAPL%2BKey%2BStatistics%22%20%20%20and%20xpath%3D%27%2F%2F*%5B%40class%3D%22yfi_rt_quote_summary%22%5D%27&format=json&diagnostics=true";			
+		      var url = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Ffinance.yahoo.com%2Fq%2Fks%3Fs%3D"+ticker+"%2BKey%2BStatistics%22%20%20%20and%20xpath%3D%27%2F%2F*%5B%40class%3D%22yfi_rt_quote_summary%22%5D%27&format=json&diagnostics=true";			
 			this.yqlScrapperCall(url, function tickerPrice(results) {
 				var price , 
 					d_change ,
