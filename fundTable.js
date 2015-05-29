@@ -22,9 +22,9 @@ var fund = (function(){
                         cellProperties.readOnly = true; //make cell read-only if it is first row or the text reads 'readOnly'
                     }
                     if (col === 1) {
-                    cellProperties.type = {
-                        renderer: that.descriptionRenderer
-                    }
+                        cellProperties.type = {
+                            renderer: that.descriptionRenderer
+                        }
                     }
                     return cellProperties;
                 },

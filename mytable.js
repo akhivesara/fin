@@ -66,7 +66,8 @@ var myTable = (function() {
 		},
 		
 		fillSlot : function(row,col,value) {
-			$("#evaluationTable").handsontable('setDataAtCell', row, col, value);			
+			$("#evaluationTable").handsontable('setDataAtCell', row, col, value);	
+			return value;		
 		},
 		
 		fillTickerSlot : function(ticker) {
@@ -165,60 +166,96 @@ var myTable = (function() {
 			);
 		},
 		
-		//key stats//			$.getJSON("http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Ffinance.yahoo.com%2Fq%2Fks%3Fs%3DTSN%2BKey%2BStatistics%22%20and%20xpath%3D'%2F%2F*%5B%40id%3D%22yfncsumtab%22%5D'&format=json&diagnostics=true", {						
+		//key stats//			$.getJSON("http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Ffinance.yahoo.com%2Fq%2Fks%3Fs%3DTSN%2BKey%2BStatistics%22%20and%20xpath%3D'%2F%2F*%5B%40id%3D%22yfncsumtab%22%5D'&format=json&diagnostics=true", {			
+		// scrapping http://finance.yahoo.com/q/ks?s={ticker}+Key+Statistics			
 		scrapeYahoo : function(ticker) {
 			var that = this;
 			ticker = ticker || $.trim( Y.autoSuggest.$searchbox.val());
 			/*valuation*/ 						
 			$.getJSON("http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Ffinance.yahoo.com%2Fq%2Fks%3Fs%3D"+ticker+"%2BKey%2BStatistics%22%20and%20xpath%3D'%2F%2F*%5B%40class%3D%22yfnc_datamodoutline1%22%5D'&format=json&diagnostics", {}, 
 			  function(json) {
+				  
+				  try {
 	            if (typeof json === "object" && json.query && json.query.results) {
 	                // we have a json object with an array of company info, cache it, and display suggestions
 					var results = json.query.results;
-	  				console.log(results);
+	  				//console.log(results);
+					// all tables  
 					var data = results.table;
+					
+					// every table can be selected using this path
+					var tableKey = 'tbody.tr.td.table.tbody.tr';
+					
 					var valuation = data[0];
 					that.current.valuation = valuation;
-					that.fillSlot(10,1,that._findValue(valuation.tr.td.table.tr,'Market Cap'));
-					that.fillSlot(2,1,that._findValue(valuation.tr.td.table.tr,'Trailing P/E'));
-					if (that._findValue(valuation.tr.td.table.tr,'Trailing P/E') != 'N/A') {
-						that.fillSlot(3,1,(100*(1/that._findValue(valuation.tr.td.table.tr,'Trailing P/E'))).toFixed(2)+'%');
+										
+					var valuationDataTable = safeLookup(valuation, tableKey);
+					
+					that.fillSlot(10,1,that._findValue(valuationDataTable,'Market Cap'));
+					
+					var pe = that.fillSlot(2,1,that._findValue(valuationDataTable,'Trailing P/E'));
+					
+					if (that._findValue(valuationDataTable,'Trailing P/E') != 'N/A') {
+						that.fillSlot(3,1,(100*(1/that._findValue(valuationDataTable,'Trailing P/E'))).toFixed(2)+'%');
 					}
-					that.fillSlot(4,1,that._findValue(valuation.tr.td.table.tr,'PEG'));										
-					that.fillSlot(5,1,that._findValue(valuation.tr.td.table.tr,'Price/Sales'));					
+					
+					that.fillSlot(4,1,that._findValue(valuationDataTable,'PEG'));
+															
+					that.fillSlot(5,1,that._findValue(valuationDataTable,'Price/Sales'));					
 					
 					var fiscalYear = data[1];
-					that.current.fiscalYear = fiscalYear;				
+					that.current.fiscalYear = fiscalYear;
+									
 					var profitability = data[2];
-					that.current.profitability = profitability;														
+					that.current.profitability = profitability;		
+																	
 					var managementEffectiveness = data[3];
-					that.current.managementEffectiveness = managementEffectiveness;																			
-					managementEffectiveness.tr.td.table.tr.shift();
-					that.fillSlot(6,1,that._findValue(managementEffectiveness.tr.td.table.tr,'Return on Equity'));
+					that.current.managementEffectiveness = managementEffectiveness;
+					var managementDataTable = safeLookup(managementEffectiveness,tableKey);
+																																		
+					//managementEffectiveness.tr.td.table.tr.shift();
+					
+					that.fillSlot(6,1,that._findValue(managementDataTable,'Return on Equity'));
+					
 					var incomeStatement =  data[4];
-					that.current.incomeStatement = incomeStatement;																								
+					that.current.incomeStatement = incomeStatement;	
+																												
 					var balanceSheet =  data[5];					
-					that.current.balanceSheet = balanceSheet;																													
+					that.current.balanceSheet = balanceSheet;
+																																		
 					var cashFlowStatement =  data[6];
 					that.current.cashFlowStatement = cashFlowStatement;																																		
 					var stockPriceHistory = data[7];
-					that.current.stockPriceHistory = stockPriceHistory;																																		
+					that.current.stockPriceHistory = stockPriceHistory;
+																																							
 					var shareStatistics = data[8];
 					that.current.shareStatistics = shareStatistics;
-                    that.fillSlot(11,1,that._findValue(shareStatistics.tr.td.table.tr,'Short % of Float', 'td.0.p.content','td.1.p' ));
-                    var nowShort = that._findValue(shareStatistics.tr.td.table.tr,'Shares Short (prior month)', 'td.0.p.content','td.1.p' );
-                    var lastShort = that._findValue(shareStatistics.tr.td.table.tr,'Shares Short', 'td.0.p.content','td.1.p' );
+					
+					var shareStatisticsDataTable = safeLookup(shareStatistics,tableKey);
+					
+                    that.fillSlot(11,1,that._findValue(shareStatisticsDataTable,'Short % of Float'));
+                    var nowShort = that._findValue(shareStatisticsDataTable,'Shares Short (prior month)');
+                    var lastShort = that._findValue(shareStatisticsDataTable,'Shares Short');
+					
                     var changeShort = parseFloat(nowShort) - parseFloat(lastShort);
                     if (changeShort != undefined) {
                         that.fillSlot(12,1,changeShort.toFixed(2));
                     }
+					
 					var dividendsSplits = data[9];
-					that.current.dividendsSplits = dividendsSplits;																																												
-					that.fillSlot(7,1,that._findValue(dividendsSplits.tr.td.table.tr,'Forward Annual Dividend Yield', 'td.0.p.content','td.1.p' ));					
-					that.fillSlot(8,1,that._findValue(dividendsSplits.tr.td.table.tr,'Payout Ratio', 'td.0.p.content','td.1.p' ));
-                    that.fillSlot(9,1,that._findValue(dividendsSplits.tr.td.table.tr,'Dividend Date', 'td.0.p.content','td.1.p' ));
+					that.current.dividendsSplits = dividendsSplits;
+					var dividendsSplitsDataTable = safeLookup(dividendsSplits,tableKey); 				
+																																													
+					that.fillSlot(7,1,that._findValue(dividendsSplitsDataTable,'Forward Annual Dividend Yield'));					
+					that.fillSlot(8,1,that._findValue(dividendsSplitsDataTable,'Payout Ratio'));
+                    that.fillSlot(9,1,that._findValue(dividendsSplitsDataTable,'Dividend Date'));
 	        	}
-			});
+			  } catch(e){
+				  console.log('scrapeYahoo exception '+e);
+			  }
+				
+			}
+			);
 		},
 		
 		_findValue : function(dataTable,entryToLookFor, keySelector,valueSelector) {
@@ -226,32 +263,29 @@ var myTable = (function() {
 				i = 0 , 
 				entry , k , v;
 			for (;i< _table.length;i++) {
+				k = null;
+				v = null;
 				entry = _table[i];
-//			dataTable.tr.td.table.tr.forEach(function(entry) {
 				if (keySelector) {
 					k = safeLookup(entry,keySelector);
 				} else {
-					k = entry.td[0].p.content || entry.td[0].p;				
+					k = safeLookup(entry, 'td.0.p.content') || safeLookup(entry, 'td.0.p') || safeLookup(entry, 'td.0.content');				
 				} 
 
 				if (valueSelector) {
 					v = safeLookup(entry , valueSelector);
 				} else {
-					if (entry.td[1].span) {
-						v = entry.td[1].span.content ;
-					} else if (entry.td[1].p) {
-						v = entry.td[1].p.content || entry.td[1].p;							
-					}
+					v = safeLookup(entry , 'td.1.span.content') || safeLookup(entry, 'td.1.p.content') || safeLookup(entry , 'td.1.p') || safeLookup(entry , 'td.1.content');							
 				}
 				if (v && k && k.indexOf(entryToLookFor)!=-1) {
 					return v.replace(',','');
 				}					
-//			})
 			}
 		},
 							
 		scrapeIndustryLink : function() {
-			//data.table.tr.td.table.tr.td[0].p[0].a.href		
+			//data.table.tr.td.table.tr.td[0].p[0].a.href
+			try {		
 			var ticker = ticker || $.trim( Y.autoSuggest.$searchbox.val());
 			var url = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Ffinance.yahoo.com%2Fq%2Fin%3Fs%3D"+ticker+"%2BIndustry%22%20and%20xpath%3D'%2F%2F*%5B%40id%3D%22yfncsumtab%22%5D'&format=json&diagnostics=true";
 			this.yqlScrapperCall(url,function(results) {
@@ -262,10 +296,14 @@ var myTable = (function() {
 				} else {
 					console.log(results.table.tr.td.table.tr.td[0].p.content);
 				}
-			});		
+			});	
+			} catch(e) {
+				console.log("scrapeIndustryLink exception "+e)
+			}	
 		},
 	
 		scrapeIndustryFromYahoo : function(url , ticker) {
+			try {
 			var ticker = ticker || $.trim( Y.autoSuggest.$searchbox.val()) ,
 				key = 'td.0.font.content',
 				value = 'td.1.font.content' ;
@@ -290,9 +328,14 @@ var myTable = (function() {
 				this.fillSlot(7,2,this._findValue(data,'Dividend Yield',key,value));	
 				this.fillSlot(9,2,this._findValue(data,'Market Capitalization',key,value));										
 			});
+		  } catch(e){
+			  console.log('scrapeIndustryFromYahoo exception '+e);
+		  }
+
 		},
 		
 		scrapeTickerPrice : function() {
+			try {
 			var ticker = ticker || $.trim( Y.autoSuggest.$searchbox.val()) ;
 			$('#quote').text('');											
 			$('#change').text('');	
@@ -342,9 +385,14 @@ var myTable = (function() {
 					}	
 				}
 			});
+			  } catch(e){
+				  console.log('scrapeTickerPrice exception '+e);
+			  }
+			
 		},
 		
 		scrapeEstimates : function(ticker) {
+			try {
 			var ticker = ticker || $.trim( Y.autoSuggest.$searchbox.val()) ;
 			$('dirtTargetMethod').text('');
 			$('#dirtyTargetMethod2').removeClass('down');						
@@ -383,7 +431,11 @@ var myTable = (function() {
 					$('#dirtyTargetMethod2').addClass('down');						
 				}
 			});
-			$('#past_future').val('');						
+			$('#past_future').val('');	
+			  } catch(e){
+				  console.log('scrapeEstimates exception '+e);
+			  }
+								
 		},
 		
 		pastFutureEstimate : function() {
@@ -440,6 +492,7 @@ var myTable = (function() {
         },
 
         scrapeNews : function() {
+			try {
 			var ticker =  $.trim( Y.autoSuggest.$searchbox.val()).toUpperCase() ;
 			var url = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Ffinance.yahoo.com%2Fq%2Fh%3Fs%3D"+ticker+"%2BHeadlines%22%20and%20xpath%3D'%2F%2F*%5B%40class%3D%22mod%20yfi_quote_headline%20withsky%22%5D'&format=json&diagnostics=true";
 			this.yqlScrapperCall(url, function(results) {
@@ -480,7 +533,11 @@ var myTable = (function() {
 					document.body.appendChild(_n);
 				}
 				_n.appendChild(_on);
-			})			
+			})
+						  } catch(e){
+				  console.log('scrapeNews exception '+e);
+			  }
+			
 		},
 		
 		
