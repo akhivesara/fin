@@ -306,7 +306,7 @@ var myTable = (function() {
 			try {
 			var ticker = ticker || $.trim( Y.autoSuggest.$searchbox.val()) ,
 				key = 'td.0.font.content',
-				value = 'td.1.font.content' ;
+				value = 'td.1.font.content';
 			url = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22"+url+"%22%20and%20xpath%3D%22%2Fhtml%2Fbody%2Ftable%2Ftr%2Ftd%2Ftable%5Blast()%5D%2Ftr%2Ftd%5Blast()%5D%22&format=json&diagnostics=true"
 			//url = url || "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Fbiz.yahoo.com%2Fic%2F515.html%22%20and%20xpath%3D%22%2Fhtml%2Fbody%2Ftable%2Ftr%2Ftd%2Ftable%5Blast()%5D%2Ftr%2Ftd%5Blast()%5D%22&format=json&diagnostics=true";
 			this.yqlScrapperCall(url, function(results) {
@@ -346,29 +346,39 @@ var myTable = (function() {
 			$('#change_aft').removeClass('down');	
 			$('#change_aft').removeClass('up');							
 							
-			var url = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Ffinance.yahoo.com%2Fq%2Fks%3Fs%3D"+ticker+"%2BKey%2BStatistics%22%20and%20xpath%3D'%2F%2F*%5B%40class%3D%22yfi_rt_quote_summary_rt_top%22%5D%2Fp'&format=json&diagnostics=true";
-			this.yqlScrapperCall(url, function(results) {
-				var price , d_change , u_change , price_aft , d_change_aft , u_change_aft , priceElement = $('#price');
+			//var url = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Ffinance.yahoo.com%2Fq%2Fks%3Fs%3D"+ticker+"%2BKey%2BStatistics%22%20and%20xpath%3D'%2F%2F*%5B%40class%3D%22yfi_rt_quote_summary_rt_top%22%5D%2Fp'&format=json&diagnostics=true";
+		      var url = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Ffinance.yahoo.com%2Fq%2Fks%3Fs%3DAAPL%2BKey%2BStatistics%22%20%20%20and%20xpath%3D%27%2F%2F*%5B%40class%3D%22yfi_rt_quote_summary%22%5D%27&format=json&diagnostics=true";			
+			this.yqlScrapperCall(url, function tickerPrice(results) {
+				var price , 
+					d_change ,
+					u_change , 
+					price_aft , 
+					d_change_aft , 
+					u_change_aft , 
+					priceElement = $('#price') ,
+					priceTable;
 				console.log(results);
-				this.current.price = results.p.span;
-				price = this._findValue(results.p.span,'time_rtq_ticker','class','span.content');
+				priceTable = safeLookup(results,'div.div.1.div.0.span');
+				this.current.price = priceTable;
+				
+				price = this._findValue(priceTable,'time_rtq_ticker','class','span.content');
 				this.current.quote = price;
 				console.log(price);
 
 				$('#quote').text(price);
-				d_change = this._findValue(results.p.span,'down_r time_rtq_content','class','span.1.content');
+				d_change = this._findValue(priceTable,'down_r time_rtq_content','class','span.1.content');
 				console.log('d_change = '+d_change);			
 				if (d_change != undefined) {
 					$('#change').text(d_change);
 					$('#change').addClass("down");
 				}			
-				u_change = this._findValue(results.p.span,'up_g time_rtq_content','class','span.1.content');	
+				u_change = this._findValue(priceTable,'up_g time_rtq_content','class','span.1.content');	
 				console.log('u_change = '+u_change);	
 				if (u_change != undefined) {
 					$('#change').text(u_change);
 					$('#change').addClass("up");
 				}	
-				price_aft = this._findValue(results.p.span,'yfs_rtq_quote','class','span.content');						
+				price_aft = this._findValue(priceTable,'yfs_rtq_quote','class','span.content');						
 				console.log(price_aft);
 				$('#quote_aft').text(price_aft);	
 				if (price_aft) {
