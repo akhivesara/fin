@@ -291,10 +291,11 @@ var myTable = (function() {
 			this.yqlScrapperCall(url,function(results) {
 				//debugger;
 				console.log(results);
-				if (results.table.tr.td.table.tr.td[0].p[0]) {
-					this.scrapeIndustryFromYahoo(results.table.tr.td.table.tr.td[0].p[0].a.href);
+				var industryLink = safeLookup(results,'table.tbody.tr.1.td.0.table.1.tbody.tr.td.table.tbody.tr.1.td.a');
+				if (industryLink) {
+					this.scrapeIndustryFromYahoo(industryLink.href);
 				} else {
-					console.log(results.table.tr.td.table.tr.td[0].p.content);
+					console.log("scrapeIndustryLink may have changed");
 				}
 			});	
 			} catch(e) {
@@ -307,26 +308,27 @@ var myTable = (function() {
 			var ticker = ticker || $.trim( Y.autoSuggest.$searchbox.val()) ,
 				key = 'td.0.font.content',
 				value = 'td.1.font.content';
-			url = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22"+url+"%22%20and%20xpath%3D%22%2Fhtml%2Fbody%2Ftable%2Ftr%2Ftd%2Ftable%5Blast()%5D%2Ftr%2Ftd%5Blast()%5D%22&format=json&diagnostics=true"
-			//url = url || "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Fbiz.yahoo.com%2Fic%2F515.html%22%20and%20xpath%3D%22%2Fhtml%2Fbody%2Ftable%2Ftr%2Ftd%2Ftable%5Blast()%5D%2Ftr%2Ftd%5Blast()%5D%22&format=json&diagnostics=true";
+
+			url = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22"+url+"%22%20AND%20xpath%3D'%2Fhtml%2Fbody%2Ftable%2Ftbody%2Ftr%2Ftd%2Ftable%5Blast()%5D%2Ftbody%2Ftr%2Ftd%5Blast()%5D'&format=json&diagnostics=true";
 			this.yqlScrapperCall(url, function(results) {
 				//debugger;
 				var t , index ;
 				for (var x =0 , len = results.td.table.length ; x < len ; x++) {
 					t = results.td.table[x];
-					if (safeLookup(t, 'tr.td.font.strong') == 'Industry Statistics') {
+					var header = safeLookup(t, 'tbody.tr.td.font.b') || safeLookup(t, 'tbody.tr.td.font.strong');
+					if ( header == 'Industry Statistics') {
 						index = x;
 						break;
 					}
 				}
-				var data = results.td.table[++index].tr;
+				var data = results.td.table[++index].tbody.tr;
 				this.current.industry = data;
 				console.log(data);				
-				this.fillSlot(2,2,this._findValue(data,'Price / Earnings',key,value));
-				this.fillSlot(3,2,(100*(1/this._findValue(data,'Price / Earnings',key,value))).toFixed(2)+'%');
-				this.fillSlot(6,2,this._findValue(data,'Return on Equity',key,value));											
-				this.fillSlot(7,2,this._findValue(data,'Dividend Yield',key,value));	
-				this.fillSlot(9,2,this._findValue(data,'Market Capitalization',key,value));										
+				this.fillSlot(2,2,this._findValue(data,'Earnings',key,value));
+				this.fillSlot(3,2,(100*(1/this._findValue(data,'Earnings',key,value))).toFixed(2)+'%');
+				this.fillSlot(6,2,this._findValue(data,'on Equity',key,value));											
+				this.fillSlot(7,2,this._findValue(data,'Yield',key,value));	
+				this.fillSlot(10,2,this._findValue(data,'Capitalization',key,value));										
 			});
 		  } catch(e){
 			  console.log('scrapeIndustryFromYahoo exception '+e);
