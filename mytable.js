@@ -415,8 +415,10 @@ var myTable = (function() {
 			this.yqlScrapperCall(url, function(results) {
 				var trends = results.table[3];
 				console.log(trends);
-				var currentYrEps = trends.tr.td.table.tr[1].td[3].p;
-				var nextYrEps = trends.tr.td.table.tr[1].td[4].p;
+				
+				var currentYrEps = trends.tbody.tr.td.table.tbody.tr[1].td[3].content;
+				var nextYrEps = trends.tbody.tr.td.table.tbody.tr[1].td[4].content;
+				
 				console.log('currentYrEps = '+currentYrEps);
 				this.current.nextYrEps = nextYrEps;
 				console.log('nextYrEps = '+nextYrEps);				
