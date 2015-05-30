@@ -477,21 +477,23 @@ var myTable = (function() {
                 var hedgeUrl = isFund ? url : url+'/hedge-funds/#/';
                 callback = callback || NOOP;
                 scrapper.scrape(hedgeUrl, function(results) {
-                    var table = results.table.tbody.tr;
+					
+                    var table = results.table.tbody[1].tr;
                     var primaryKeys = [];
                     var data = [];
-                    for (var x=0 ; x<results.table.tr.th.length;x++) {
-                        primaryKeys.push(results.table.tr.th[x].p);
+                    for (var x=0 ; x<results.table.tbody[0].tr.th.length;x++) {
+                        primaryKeys.push(results.table.tbody[0].tr.th[x]);
                     }
+					primaryKeys = results.table.tbody[0].tr.th;
                     for (var x=0;x<table.length;x++) {
                         var item = table[x].td;
                         data[x] = {};
-                        data[x][primaryKeys[0]] = item[0].p;
+                        data[x][primaryKeys[0]] = item[0];
                         data[x][primaryKeys[1]] = {fund:item[1].div.a.content , link : item[1].div.a.href , manager:item[1].div.p};
-                        data[x][primaryKeys[2]] = item[2].p;
-                        data[x][primaryKeys[3]] = item[3].p;
-                        data[x][primaryKeys[4]] = safeLookup(item[4], 'p.content');
-                        data[x][primaryKeys[5]] = item[5].p;
+                        data[x][primaryKeys[2]] = item[2];
+                        data[x][primaryKeys[3]] = item[3];
+                        data[x][primaryKeys[4]] = safeLookup(item[4], 'content', ' --- ');
+                        data[x][primaryKeys[5]] = item[5];
                     }
                     console.dir(data);
                     //window.data = data;
