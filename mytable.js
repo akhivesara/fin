@@ -530,12 +530,12 @@ var myTable = (function() {
 					div.appendChild(h);
 					var news_date = news[x];
 					var ul = document.createElement('ul');
-					for (var y=0;y<news_date.li.length;y++) {
+					for (var y=0;y<news_date[news_date.length-1].li.length;y++) {
 						var li = document.createElement('li');
 						li.className = 'yfi_quote_headline';
 						var a = document.createElement('a');
-						a.textContent =  news_date.li[y].a.content;
-						a.href = news_date.li[y].a.href;
+						a.textContent =  news_date[news_date.length-1].li[y].a.content;
+						a.href = news_date[news_date.length-1].li[y].a.href;
 						a.target= '_blank';
 						li.appendChild(a);
 						ul.appendChild(li);
