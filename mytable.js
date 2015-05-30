@@ -380,6 +380,8 @@ var myTable = (function() {
 					$('#change').text(u_change);
 					$('#change').addClass("up");
 				}	
+				
+				priceTable = safeLookup(results,'div.div.1.div.1.span');
 				price_aft = this._findValue(priceTable,'yfs_rtq_quote','class','span.content');						
 				console.log(price_aft);
 				$('#quote_aft').text(price_aft);	
